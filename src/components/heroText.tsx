@@ -52,6 +52,17 @@ const META_LETTER_SPACING = "0.25em";
 // Colour for metadata.
 const META_COLOR = "#a1a1aa"; // zinc-400
 
+// ── Mandala Art Configuration ────────────────────────────────────────────────
+const MANDALA_TOP = "-top-4";
+const MANDALA_RIGHT = "-right-56";
+const MANDALA_SIZE = "w-[750px] h-[750px]";
+const MANDALA_OPACITY = "opacity-20";
+
+// ── Description Text Style ───────────────────────────────────────────────────
+// Adjust the text shadow to ensure the dark text is readable over the spinning mandala
+// A subtle white halo ensures it pops against dark lines, and a light dark shadow gives depth.
+const DESC_TEXT_SHADOW = "0px 2px 15px rgba(248, 248, 246, 0.9), 0px 0px 5px rgba(255, 255, 255, 1)";
+
 // ── Scroll-exit animation ────────────────────────────────────────────────────
 // How much the wordmark scales DOWN as you scroll past the Hero.
 // 1 = no change, 0.9 = 10% smaller.
@@ -74,6 +85,7 @@ export default function HeroText() {
     const metaLeftBottomRef = useRef<HTMLDivElement>(null);
     const metaRightBottomRef = useRef<HTMLDivElement>(null);
     const lineRef = useRef<HTMLDivElement>(null);
+    const mandalaRef = useRef<HTMLImageElement>(null);
 
     useEffect(() => {
         gsap.registerPlugin(ScrollTrigger);
@@ -102,6 +114,16 @@ export default function HeroText() {
                     { opacity: 0, y: 5 },
                     { opacity: 1, y: 0, duration: 1, delay: 0.3, stagger: 0.08, ease: "power2.out" }
                 );
+            }
+
+            // Infinite slow rotation for the mandala
+            if (mandalaRef.current) {
+                gsap.to(mandalaRef.current, {
+                    rotation: 360,
+                    repeat: -1,
+                    duration: 60, // 60 seconds for a full rotation (nice and slow)
+                    ease: "none"
+                });
             }
 
             // Scroll effects: color, scale, opacity (no pin — line is driven by slidingPanel)
@@ -151,10 +173,18 @@ export default function HeroText() {
             style={{ backgroundColor: HERO_BG }}
             className="relative w-full h-screen min-h-[650px] flex flex-col justify-between p-6 sm:p-10 md:p-14 select-none overflow-hidden text-zinc-900 border-b border-zinc-200/60"
         >
-
+            {/* ── TOP-RIGHT MANDALA ARTWORK ── */}
+            <div className={`absolute ${MANDALA_TOP} ${MANDALA_RIGHT} ${MANDALA_OPACITY} pointer-events-none z-0 overflow-hidden select-none`}>
+                <img
+                    ref={mandalaRef}
+                    src="/mandala.svg"
+                    alt="Mandala Art"
+                    className={`${MANDALA_SIZE} object-contain block`}
+                />
+            </div>
 
             {/* ── CENTRE-LEFT WORDMARK + WHAT IS ── */}
-            <div data-hero-wordmark className="w-full flex-1 flex items-center justify-start py-0">
+            <div data-hero-wordmark className="w-full flex-1 flex items-center justify-start py-0 relative z-10">
                 <div
                     ref={wordmarkRef}
                     className="w-full flex flex-col items-start"
@@ -208,8 +238,13 @@ export default function HeroText() {
                 className="absolute inset-0 flex items-center justify-center px-8 sm:px-16 md:px-24 pointer-events-none z-20"
             >
                 <p
-                    className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-thin leading-snug tracking-tight text-center flex flex-wrap justify-center gap-x-[0.25em]"
-                    style={{ color: "#18181b", fontFamily: "'Kumbh Sans', sans-serif", maxWidth: "900px" }}
+                    className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extralight leading-snug tracking-tight text-center flex flex-wrap justify-center gap-x-[0.25em]"
+                    style={{ 
+                        color: "#18181b", 
+                        fontFamily: "'Kumbh Sans', sans-serif", 
+                        maxWidth: "900px",
+                        textShadow: DESC_TEXT_SHADOW
+                    }}
                 >
                     {"Exhibit'26 is a project competition where students showcase working prototypes across AI, Climate Tech, HealthTech, and more.".split(" ").map((word, wIdx) => (
                         <span key={wIdx} className="inline-block">
